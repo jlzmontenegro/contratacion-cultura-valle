@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contratación Secretaría de Cultura</title>
+<meta name="description" content="Contratación de la Secretaría de Cultura de la Gobernación del Valle del Cauca desde 2024: en qué se ha gastado la plata. Datos abiertos de SECOP II.">
+<style>
+  /* ===== Tokens (tema claro) ===== */
+  :root{
+    color-scheme: light;
+    --bg:#f5f6f8; --panel:#ffffff; --panel2:#f2f4f7; --line:#e3e6eb;
+    --txt:#1f2430; --strong:#0b0d12; --muted:#5b6170; --accent:#1c5cab; --accent-soft:#e6eefa;
+    --green:#006300; --amber:#8a5a00; --red:#c0392b;
+    --barra:#2a78d6; --base:#c3c2b7; --grid:#e1e0d9;
+    --shadow:0 1px 3px rgba(11,13,18,.06),0 1px 2px rgba(11,13,18,.04);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13.5px;line-height:1.45;-webkit-text-size-adjust:100%;overflow-x:clip}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  button{font:inherit}
+  .wrap{max-width:1400px;margin:0 auto;padding:10px}
+  .muted{color:var(--muted)}
+  .vacio{padding:22px;text-align:center;color:var(--muted)}
+
+  /* ===== Encabezado ===== */
+  header.top{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+  header.top h1{margin:0 0 4px;font-size:17px;line-height:1.25;color:var(--strong)}
+  header.top .sub{color:var(--muted);font-size:12.5px}
+  header.top .metas{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12px}
+  header.top .metas b{color:var(--strong)}
+  #m-status.online{color:var(--green);font-weight:600}
+  #m-status.offline{color:var(--amber);font-weight:600}
+  .lead{font-size:14px;color:var(--strong);margin:0 2px 12px;max-width:1100px}
+  .lead b{color:var(--accent)}
+
+  /* ===== KPIs ===== */
+  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);min-width:0;border-left:4px solid var(--kc,var(--accent))}
+  .kpi .lab{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.5px}
+  .kpi .val{font-size:18px;font-weight:700;margin-top:4px;color:var(--strong);overflow-wrap:anywhere;line-height:1.2}
+  .kpi .nota{color:var(--muted);font-size:11px;margin-top:3px}
+
+  /* ===== Tarjetas ===== */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:var(--shadow);min-width:0}
+  .card h2,.card h3{margin:0 0 10px;font-size:14px;color:var(--strong);line-height:1.3}
+  .card h2{font-size:15.5px}
+  .card .hint{display:block;color:var(--muted);font-weight:400;font-size:11.5px;margin-top:2px}
+  .card p.expl{margin:8px 0 0;color:var(--muted);font-size:12px}
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+  .grid2>*{min-width:0}
+
+  /* ===== Depuración ===== */
+  .depura{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+  .depura .paso{display:flex;align-items:baseline;gap:6px;font-size:12.5px}
+  .depura .paso b{font-size:17px;color:var(--strong)}
+  .depura .flecha{color:var(--muted)}
+  .badge{display:inline-block;border-radius:20px;padding:2px 9px;font-size:11.5px;font-weight:600}
+  .badge.ok{background:#e4f4e4;color:#14532d}
+  .badge.warn{background:#fdf0d5;color:#7a4b00}
+  details.mas summary{cursor:pointer;color:var(--accent);font-size:12.5px;margin-top:10px}
+  details.mas[open] summary{margin-bottom:8px}
+
+  /* ===== Filtros ===== */
+  .ftoggle{display:flex;width:100%;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:14px;font-weight:600;color:var(--strong);cursor:pointer;box-shadow:var(--shadow);margin-bottom:8px}
+  .ftoggle .n{background:var(--accent);color:#fff;border-radius:20px;font-size:11.5px;padding:1px 8px;margin-left:6px}
+  .filterbar{display:none}
+  .filterbar.open{display:block}
+  .fgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+  .fld{min-width:0}
+  .fld label,.fld .lbl{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .fld input[type=text],.fld input[type=number],.fld select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:9px 10px;font-size:14px;min-width:0}
+  .fld input:focus,.fld select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+  .yrs{display:flex;flex-wrap:wrap;gap:6px}
+  .yrs button{border:1px solid var(--line);background:var(--panel2);border-radius:20px;padding:7px 14px;cursor:pointer;color:var(--txt);font-size:13px}
+  .yrs button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  button.act{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:10px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+  button.act:hover{border-color:var(--accent);background:var(--accent-soft)}
+  button.clear{color:var(--red)}
+  #chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;align-items:center}
+  #chips .lbl{font-size:12px;color:var(--muted)}
+  .chip{background:var(--panel);border:1px solid var(--accent);border-radius:20px;padding:4px 6px 4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;max-width:100%}
+  .chip b{color:var(--accent)}
+  .chip .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+  .chip .x{cursor:pointer;color:var(--muted);font-weight:700;border:0;background:none;padding:2px 6px;font-size:13px}
+  .chip .x:hover{color:var(--red)}
+
+  /* ===== Barra de métrica (fija arriba) ===== */
+  .metricbar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;background:rgba(245,246,248,.95);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:7px 2px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+  .metricbar .grp{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel)}
+  .seg button{border:0;background:none;padding:6px 9px;font-size:12px;cursor:pointer;color:var(--txt)}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button[aria-pressed=true]{background:var(--accent);color:#fff;font-weight:600}
+  .metricbar .resumen{width:100%;font-size:12px;color:var(--strong);font-variant-numeric:tabular-nums}
+
+  /* ===== Barras horizontales ===== */
+  .bar-row{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;margin-bottom:7px;cursor:pointer;border-radius:6px;padding:3px 4px}
+  .bar-row:hover,.bar-row:focus-visible{background:var(--panel2);outline:none}
+  .bar-row.sel{background:var(--accent-soft)}
+  .bar-row.sel .bar-lab{font-weight:700;color:var(--strong)}
+  .bar-row.dim .bar-fill{opacity:.3}
+  .bar-lab{width:100%;font-size:12px;color:var(--txt);line-height:1.25;overflow-wrap:anywhere}
+  .bar-lab .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}
+  .bar-track{flex:1;height:14px;position:relative;min-width:30px}
+  .bar-fill{height:100%;border-radius:0 4px 4px 0;min-width:2px;transition:width .25s}
+  .bar-val{font-size:11.5px;color:var(--strong);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .bar-val .sec{color:var(--muted);font-size:10.5px;margin-left:4px}
+
+  /* ===== Columnas verticales (año, mes) ===== */
+  .colscroll{overflow-x:auto;max-width:100%;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .cols-v{display:flex;align-items:stretch;gap:4px;height:200px;border-bottom:1px solid var(--base);padding:0 2px}
+  .col-v{flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:pointer;border-radius:6px 6px 0 0;padding:0 1px}
+  .col-v:hover,.col-v:focus-visible{background:var(--panel2);outline:none}
+  .col-v.sel{background:var(--accent-soft)}
+  .col-v.dim .cv-bar{opacity:.3}
+  .col-v .cv-val{font-size:11px;font-weight:700;color:var(--strong);text-align:center;line-height:1.2;margin-bottom:4px}
+  .col-v .cv-val small{display:block;font-weight:400;color:var(--muted);font-size:10px}
+  .col-v .cv-bar{width:min(100%,56px);border-radius:4px 4px 0 0;min-height:2px;transition:height .25s}
+  .cols-v-lbls{display:flex;gap:4px;padding:0 2px;margin-top:5px}
+  .cols-v-lbls div{flex:1 1 0;min-width:0;text-align:center;font-size:10.5px;color:var(--txt);line-height:1.2;overflow-wrap:break-word}
+  .cols-v-lbls div.sel{font-weight:700;color:var(--strong)}
+
+  /* ===== Tortas (donas) ===== */
+  .pie{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:center}
+  .pie svg{width:100%;max-width:230px;height:auto;margin:0 auto;display:block;overflow:visible}
+  .pie path{cursor:pointer;transition:opacity .2s}
+  .pie path:hover,.pie path:focus-visible{opacity:.85;outline:none}
+  .pie path.dim{opacity:.25}
+  .pie .c1{font-size:19px;font-weight:700;fill:var(--strong)}
+  .pie .c2{font-size:10.5px;fill:var(--muted)}
+  .leg{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .leg-row{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:4px 8px;align-items:baseline;font-size:12px;cursor:pointer;border-radius:6px;padding:4px 5px}
+  .leg-row:hover,.leg-row:focus-visible{background:var(--panel2);outline:none}
+  .leg-row.sel{background:var(--accent-soft);font-weight:600}
+  .leg-row.dim{opacity:.5}
+  .leg-row i{width:12px;height:12px;border-radius:3px;align-self:center}
+  .leg-row .nm{line-height:1.25;overflow-wrap:anywhere;color:var(--txt)}
+  .leg-row .vv{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--strong)}
+  .leg-row .vv small{display:block;color:var(--muted);font-size:10.5px;font-weight:400}
+
+  /* ===== ¿En qué se gastó? ===== */
+  .gasto-lead{margin:0 0 12px;font-size:14px;color:var(--strong);max-width:1050px}
+  .gasto{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+  .gasto>*{min-width:0}
+  .rubro{border-top:1px solid var(--line);padding-top:8px;margin-bottom:8px;min-width:0}
+  .rubro-h{display:flex;align-items:baseline;gap:8px;cursor:pointer;border-radius:6px;padding:3px 4px;margin:0 -4px 4px}
+  .rubro-h:hover{background:var(--panel2)}
+  .rubro-h.on{background:var(--accent-soft)}
+  .rubro-h i{width:12px;height:12px;border-radius:3px;flex:none;align-self:center}
+  .rubro-h .nm{font-weight:700;color:var(--strong);font-size:13px;flex:1;min-width:0}
+  .rubro-h .pc{font-size:16px;font-weight:700;color:var(--strong)}
+  .gsub{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;align-items:center;font-size:12px;padding:3px 4px;margin:0 -4px;border-radius:5px;cursor:pointer}
+  .gsub:hover{background:var(--panel2)}
+  .gsub.on{background:var(--accent-soft);font-weight:600}
+  .gsub .sl{color:var(--txt);line-height:1.25;overflow-wrap:anywhere}
+  .gsub .sv{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--strong);text-align:right}
+  .gsub .sv small{color:var(--muted);margin-left:4px}
+  .gsub .st{grid-column:1/-1;height:8px;background:var(--panel2);border-radius:0 4px 4px 0;position:relative}
+  .gsub .st span{position:absolute;left:0;top:0;bottom:0;border-radius:0 4px 4px 0;min-width:2px}
+
+  /* ===== Hallazgos ===== */
+  ul.hall{margin:0;padding-left:18px}
+  ul.hall li{margin-bottom:7px;font-size:13px}
+  ul.hall b{color:var(--strong)}
+
+  /* ===== Tooltip ===== */
+  #tip{position:fixed;pointer-events:none;background:#0b0d12;color:#fff;font-size:12px;padding:8px 10px;border-radius:7px;max-width:320px;z-index:60;display:none;line-height:1.45;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+  #tip b{color:#cde2fb}
+  #tip .r{display:flex;justify-content:space-between;gap:14px}
+  #tip .r span:last-child{font-variant-numeric:tabular-nums;font-weight:600}
+
+  /* ===== Tabla (móvil: tarjetas; escritorio: tabla) ===== */
+  .tbl-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+  .tbl-tools .sortsel{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);flex:1;min-width:0}
+  .tbl-tools select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-size:13px;min-width:0;max-width:100%;color:var(--txt)}
+  .tbl-tools .dirb{border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:6px 10px;cursor:pointer}
+  details.cols{position:relative}
+  details.cols summary{list-style:none;cursor:pointer;border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:7px 12px;font-size:12.5px;white-space:nowrap}
+  details.cols summary::-webkit-details-marker{display:none}
+  details.cols[open] summary{border-color:var(--accent)}
+  .cols-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:30;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:10px 12px;width:310px;max-width:88vw;display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+  .cols-panel label{font-size:12px;display:flex;gap:6px;align-items:center;cursor:pointer}
+  .cols-panel .acc{grid-column:1/-1;display:flex;gap:12px;border-top:1px solid var(--line);padding-top:6px;margin-top:4px}
+  .cols-panel .acc button{border:0;background:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0}
+  table{width:100%;border-collapse:collapse}
+  table.tbl thead{display:none}
+  table.tbl tr.fila{display:block;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:var(--panel)}
+  table.tbl tr.fila td{display:grid;grid-template-columns:104px minmax(0,1fr);gap:8px;padding:3px 0;border:0;font-size:12.5px}
+  table.tbl tr.fila td::before{content:attr(data-l);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.3px;padding-top:1px}
+  table.tbl tr.fila td.obj{grid-template-columns:minmax(0,1fr)}
+  table.tbl tr.fila td.obj::before{display:none}
+  table.tbl tr.det{display:block;margin:-6px 0 10px}
+  table.tbl tr.det td{display:block;background:var(--panel2);border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;padding:10px}
+  td.obj{color:#3a4150;font-size:12px;overflow-wrap:anywhere}
+  td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  td.prv{font-weight:600;color:var(--strong);overflow-wrap:anywhere}
+  td.ref{color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+  .doc{color:var(--muted);font-size:10.5px;font-weight:400}
+  .tag{display:inline-block;padding:1px 7px;border-radius:12px;font-size:10.5px;font-weight:600;line-height:1.35;color:#fff}
+  .estado{display:inline-block;padding:1px 8px;border-radius:12px;font-size:10.5px;font-weight:600;white-space:nowrap;background:var(--panel2);color:var(--strong)}
+  .adic{color:#9a3412;font-weight:700}
+  .modb{border:1px solid var(--line);background:var(--panel2);border-radius:14px;padding:2px 9px;font-size:11.5px;cursor:pointer;color:var(--strong)}
+  .modb:hover{border-color:var(--accent)}
+  .modb.cero{opacity:.6;cursor:default}
+  a.btn-secop{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;background:var(--accent);color:#fff;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:600}
+  a.btn-secop:hover{background:#184f95;text-decoration:none}
+  .detgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;font-size:12px}
+  .detgrid h4{margin:0 0 6px;font-size:12px;color:var(--strong)}
+  .modlist{margin:0;padding:0;list-style:none}
+  .modlist li{border-left:3px solid var(--line);padding:2px 0 6px 8px;margin-bottom:4px}
+  .modlist li.mod{border-color:#eb6834}
+  .modlist li.adi{border-color:#9a3412}
+  .modlist .f{color:var(--muted);font-size:11px}
+  .kv{display:grid;grid-template-columns:120px minmax(0,1fr);gap:3px 8px}
+  .kv span:nth-child(odd){color:var(--muted)}
+  .pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .pager .pg{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .pager button,.pager select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:7px;padding:7px 11px;cursor:pointer}
+  .pager button:disabled{opacity:.4;cursor:default}
+  table.plain{font-size:11.5px}
+  table.plain th,table.plain td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  table.plain th{background:var(--panel2);font-size:10.5px;text-transform:uppercase;letter-spacing:.3px}
+  table.plain .num{text-align:right}
+  .tblwrap{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+  .meth ul{margin:6px 0 0;padding-left:18px;font-size:12.5px;color:var(--muted)}
+  .meth li{margin-bottom:6px}
+  .meth code{background:var(--panel2);padding:1px 5px;border-radius:4px;color:#6b3d00;font-size:11.5px;overflow-wrap:anywhere}
+  pre.q{white-space:pre-wrap;word-break:break-word;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:11px;color:#3a4150;max-height:180px;overflow:auto}
+  footer{text-align:center;color:var(--muted);font-size:11.5px;margin:8px 0 22px}
+
+  /* ===== ≥ 600px ===== */
+  @media(min-width:600px){
+    .wrap{padding:14px}
+    .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .fgrid .ancho{grid-column:1/-1}
+    button.act{flex:0 0 auto}
+    .bar-row{flex-wrap:nowrap}
+    .bar-lab{width:200px;min-width:200px;text-align:right}
+    .bar-val{min-width:150px}
+    .pie{grid-template-columns:200px minmax(0,1fr)}
+    .detgrid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+  }
+  /* ===== ≥ 900px: tabla real ===== */
+  @media(min-width:900px){
+    body{font-size:14px}
+    .wrap{padding:18px}
+    header.top{padding:18px 22px}
+    header.top h1{font-size:21px}
+    .lead{font-size:15px}
+    .kpis{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+    .kpi{padding:12px 14px}
+    .kpi .val{font-size:20px}
+    .card{padding:16px}
+    .card .hint{display:inline;margin:0 0 0 6px}
+    .grid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .ftoggle{display:none}
+    .filterbar{display:block}
+    .fgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 14px}
+    .fgrid .ancho{grid-column:span 2}
+    .fgrid .todo{grid-column:1/-1}
+    .metricbar .resumen{width:auto;margin-left:auto}
+    .gasto{grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:24px}
+    .gasto .pie{grid-template-columns:minmax(0,1fr)}
+    .grid2 .bar-row{flex-wrap:wrap}
+    .grid2 .bar-lab{width:100%;min-width:0;text-align:left}
+    .grid2 .bar-val{min-width:0}
+    .gasto-cats{columns:2;column-gap:22px}
+    .rubro{break-inside:avoid}
+    .bar-lab{width:280px;min-width:280px}
+    #chart-prov .bar-lab{width:340px;min-width:340px}
+    .cols-v{height:230px;gap:8px}
+    .cols-v-lbls{gap:8px}
+    .tbl-tools .sortsel{flex:0 1 auto}
+    table.tbl thead{display:table-header-group}
+    table.tbl tr.fila{display:table-row;border:0;border-radius:0;padding:0;margin:0}
+    table.tbl tr.fila:hover{background:#fafbfc}
+    table.tbl th,table.tbl tr.fila td{display:table-cell;padding:7px 7px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35;font-size:12px}
+    table.tbl tr.fila td::before{display:none}
+    table.tbl th{background:var(--panel2);user-select:none;white-space:nowrap;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px}
+    table.tbl th.sort{cursor:pointer}
+    table.tbl th.sort:hover{color:var(--accent)}
+    table.tbl th .arr{color:var(--accent);font-size:10px}
+    table.tbl th.num,table.tbl td.num{text-align:right}
+    table.tbl td.obj{min-width:240px;max-width:460px;font-size:11.5px}
+    table.tbl td.prv{min-width:130px;max-width:200px}
+    table.tbl td.ref{max-width:110px}
+    table.tbl tr.det{display:table-row;margin:0}
+    table.tbl tr.det td{display:table-cell;border-radius:0;border:0;border-bottom:1px solid var(--line);padding:12px 14px}
+    table.tbl tr.det .detgrid{position:sticky;left:14px;max-width:min(1300px,calc(100vw - 90px))}
+  }
+  @media(min-width:1200px){
+    .fgrid{grid-template-columns:repeat(6,minmax(0,1fr))}
+    .fgrid .ancho{grid-column:span 2}
+  }
+  @media print{
+    body{background:#fff;color:#000}
+    .noprint,.pager,#chips,.btns,.metricbar,.tbl-tools,.ftoggle,.filterbar{display:none!important}
+    .card,header.top{border:1px solid #ccc;background:#fff;box-shadow:none;break-inside:avoid}
+    table.tbl th{position:static}
+    a{color:#000}
+    a.btn-secop{background:none;color:#000;padding:0}
+  }
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Contratación · Secretaría de Cultura del Valle del Cauca</h1>
+    <div class="sub">Gobernación del Valle del Cauca · contratos firmados desde el 1 de enero de 2024 · depurados: sin duplicados, sin cancelados y sin borradores</div>
+    <div class="metas">
+      <span>NIT <b id="m-nit"></b></span>
+      <span>Contratos <b id="m-n"></b></span>
+      <span>Firmados entre <b id="m-per"></b></span>
+      <span>Fuente <b><a href="https://www.datos.gov.co/Gastos-Gubernamentales/SECOP-II-Contratos-Electr-nicos/jbjy-vk9h" target="_blank" rel="noopener">SECOP II · jbjy-vk9h</a></b></span>
+      <span class="muted">Datos base: <span id="m-dl"></span></span>
+      <span id="m-status" class="muted"></span>
+    </div>
+  </header>
+
+  <p class="lead" id="lead">Cargando…</p>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card" id="depuracion">
+    <h3>Depuración de los datos <span class="hint">— lo que se quitó antes de analizar</span></h3>
+    <div class="depura" id="dep-pasos"></div>
+    <details class="mas">
+      <summary>Ver los registros excluidos y la verificación</summary>
+      <div id="dep-detalle"></div>
+    </details>
+  </div>
+
+  <button class="ftoggle noprint" id="ftoggle" aria-expanded="false" aria-controls="filterbar">
+    <span>⚙ Filtros <span class="n" id="fcount" hidden></span></span><span id="ftoggle-ic">▾</span>
+  </button>
+  <div class="card filterbar noprint" id="filterbar">
+    <h3>Filtros <span class="hint">— se combinan entre sí; en cada lista puedes sumar varios valores, y los gráficos también filtran al tocarlos</span></h3>
+    <div class="fgrid">
+      <div class="fld ancho">
+        <label for="f-q">Buscar (objeto, contratista, nº de contrato, documento, supervisor)</label>
+        <input type="text" id="f-q" placeholder="Ej: salsa, biblioteca, Recreavalle, 1.230.17…" autocomplete="off">
+      </div>
+      <div class="fld"><span class="lbl">Año de firma</span><div class="yrs" id="f-anos"></div></div>
+      <div class="fld ancho"><label for="f-prov">Contratista</label><input type="text" id="f-prov" list="dl-prov" placeholder="Escribe y elige…" autocomplete="off"><datalist id="dl-prov"></datalist></div>
+      <div class="fld"><label for="f-rubro">Rubro del gasto</label><select id="f-rubro"></select></div>
+      <div class="fld"><label for="f-cat">Categoría</label><select id="f-cat"></select></div>
+      <div class="fld"><label for="f-nat">Naturaleza del contrato</label><select id="f-nat"></select></div>
+      <div class="fld"><label for="f-prog">Proyecto de inversión</label><select id="f-prog"></select></div>
+      <div class="fld"><label for="f-est">Estado</label><select id="f-est"></select></div>
+      <div class="fld"><label for="f-nov">Modificaciones</label><select id="f-nov"></select></div>
+      <div class="fld"><label for="f-tipo">Tipo (según SECOP)</label><select id="f-tipo"></select></div>
+      <div class="fld"><label for="f-mod">Modalidad</label><select id="f-mod"></select></div>
+      <div class="fld"><label for="f-min">Valor mínimo (COP)</label><input type="number" id="f-min" inputmode="numeric" placeholder="mínimo" min="0"></div>
+      <div class="fld"><label for="f-max">Valor máximo (COP)</label><input type="number" id="f-max" inputmode="numeric" placeholder="máximo" min="0"></div>
+      <div class="fld todo">
+        <div class="btns">
+          <button class="act" id="b-csv">⬇ CSV (Excel)</button>
+          <button class="act" id="b-pdf">🖨 PDF</button>
+          <button class="act clear" id="b-clr">↺ Limpiar filtros</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chips" class="noprint"></div>
+
+  <div class="metricbar noprint">
+    <div class="grp">Medir por
+      <div class="seg" role="group" aria-label="Medir por">
+        <button data-metric="v" aria-pressed="true">Valor</button><button data-metric="n" aria-pressed="false">Nº contratos</button>
+      </div>
+    </div>
+    <div class="grp">Mostrar
+      <div class="seg" role="group" aria-label="Mostrar">
+        <button data-fmt="abs" aria-pressed="true">Cifras</button><button data-fmt="pct" aria-pressed="false">%</button>
+      </div>
+    </div>
+    <div class="resumen" id="m-resumen"></div>
+  </div>
+
+  <div class="card">
+    <h2>¿En qué se ha gastado la plata? <span class="hint">— rubros y categorías leídos del objeto de cada contrato · toca un rubro o una categoría para filtrar</span></h2>
+    <p class="gasto-lead" id="gasto-lead"></p>
+    <div class="gasto">
+      <div id="pie-rubro"></div>
+      <div class="gasto-cats" id="gasto-cats"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Hallazgos <span class="hint">— se recalculan con los filtros</span></h3>
+    <ul class="hall" id="hallazgos"></ul>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Naturaleza del contrato <span class="hint">— leída del objeto, no del «tipo» que reporta SECOP</span></h3>
+      <div id="pie-nat"></div>
+    </div>
+    <div class="card">
+      <h3>Estado de los contratos <span class="hint">— según SECOP</span></h3>
+      <div id="pie-est"></div>
+      <p class="expl" id="est-nota"></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Top 15 contratistas por valor <span class="hint">— el color es el rubro principal de cada contratista · toca para filtrar</span></h3>
+    <div id="chart-prov"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Por año de firma <span class="hint">— toca un año para filtrar</span></h3>
+      <div id="chart-ano"></div>
+    </div>
+    <div class="card">
+      <h3>Modificaciones y adiciones <span class="hint">— según los registros de SECOP II</span></h3>
+      <div id="pie-nov"></div>
+      <p class="expl">La adición en valor se estima como el valor actual del contrato menos el precio base de su proceso; SECOP II no publica el valor inicial.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Por mes de firma <span class="hint">— toca un mes para filtrar · desliza a los lados en el celular</span></h3>
+    <div id="chart-mes"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Proyecto de inversión <span class="hint">— el que cita el objeto</span></h3>
+      <div id="chart-prog"></div>
+    </div>
+    <div class="card">
+      <h3>Tipo de contrato según SECOP <span class="hint">— toca para filtrar</span></h3>
+      <div id="chart-tipo"></div>
+      <p class="expl" id="tipo-nota"></p>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Modalidad de contratación</h3>
+      <div id="chart-moda"></div>
+    </div>
+    <div class="card">
+      <h3>Origen de los recursos <span class="hint" id="fuente-cob"></span></h3>
+      <div id="chart-fuente"></div>
+    </div>
+  </div>
+
+  <div class="card" id="tabla">
+    <h2>Contratos <span class="hint" id="tbl-count"></span></h2>
+    <div class="tbl-tools noprint">
+      <div class="sortsel"><label for="sort-sel">Ordenar</label><select id="sort-sel"></select><button class="dirb" id="sort-dir" aria-label="Cambiar dirección del orden">↓</button></div>
+      <details class="cols">
+        <summary>☰ Columnas (<span id="cols-n"></span>)</summary>
+        <div class="cols-panel" id="cols-panel"></div>
+      </details>
+    </div>
+    <div class="tblwrap"><table class="tbl"><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table></div>
+    <div class="pager noprint">
+      <div class="muted" id="pg-info"></div>
+      <div class="pg">
+        <select id="pg-per" aria-label="Filas por página"><option>25</option><option selected>50</option><option>100</option></select>
+        <button id="pg-prev" aria-label="Página anterior">‹</button>
+        <span class="muted" id="pg-cur"></span>
+        <button id="pg-next" aria-label="Página siguiente">›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card meth">
+    <h3>Cómo se armó este tablero</h3>
+    <ul>
+      <li><b>Fuente:</b> SECOP II · Contratos Electrónicos (<code>jbjy-vk9h</code>) en datos.gov.co, con la consulta entregada: entidad <code id="meth-ent"></code> y fecha de firma desde el 1-ene-2024. Las secretarías de la Gobernación comparten el NIT, por eso se filtra por el nombre de la entidad.</li>
+      <li><b>Depuración:</b> una fila por <code>id_contrato</code>; se excluyen los estados Cancelado y Borrador; se quitan los contratos registrados dos veces con otro ID (mismo documento del contratista, mismo valor y mismo objeto, firmados con 10 días o menos de diferencia: se conserva el de estado más avanzado). Los contratos sucesivos de una misma persona se firman con 54 días o más de distancia, así que no se confunden con duplicados.</li>
+      <li><b>Modificaciones:</b> registros de SECOP II · Modificaciones a contratos (<code>cb9c-h8sn</code>). Se cuentan las que cambian el contrato (modificación general, adición, prórroga, suspensión, cesión); el cierre o liquidación y los registros sin tipo se listan en el detalle pero no se cuentan.</li>
+      <li><b>Adiciones:</b> SECOP II no publica el valor inicial. Se estima como <code>valor del contrato − precio base del proceso</code> (SECOP II · Procesos, <code>p6dx-8zbt</code>); en los contratos sin modificaciones ese precio base coincide con el valor en el 99% de los casos. Los días adicionados vienen de <code>dias_adicionados</code>.</li>
+      <li><b>Valor:</b> <code>valor_del_contrato</code> (incluye las adiciones). <code>valor_pagado</code> casi siempre llega en 0 en SECOP II, por eso no se usa.</li>
+      <li><b>Categorías:</b> la función <code>categorizar()</code> de <code>nucleo.js</code> lee el objeto sin tildes y la primera regla que coincide gana. No se usan palabras del nombre de la entidad ni el nombre de los proyectos de inversión, que se repiten en casi todos los objetos. Las prestaciones de servicios con persona natural (OPS) tienen objetos genéricos: solo dicen si es perfil profesional o de apoyo a la gestión.</li>
+      <li><b>Actualización:</b> al abrirse, la página vuelve a consultar la API (contratos, modificaciones y precios base) y aplica la misma depuración; si no hay conexión o la respuesta llega incompleta, usa los datos locales.</li>
+    </ul>
+    <details class="mas">
+      <summary>Ver la consulta SoQL y el desglose por categoría</summary>
+      <pre class="q" id="meth-q"></pre>
+      <div class="tblwrap"><table class="plain" id="meth-tbl"></table></div>
+    </details>
+  </div>
+
+  <footer>Tablero autónomo, sin librerías externas. Datos abiertos de SECOP II vía datos.gov.co · se actualiza en vivo al abrirlo.</footer>
+</div>
+
+<script src="datos.js" charset="utf-8"></script>
+<script src="nucleo.js" charset="utf-8"></script>
+<script>
+'use strict';
+/* ============================================================
+   0. UTILIDADES
+   ============================================================ */
+const NU = window.NUCLEO, norm = NU.norm;
+const COP = new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0});
+const NUM = new Intl.NumberFormat('es-CO');
+const fmtCOP = v => COP.format(v||0);
+const fmtN = v => NUM.format(v||0);
+const fmtPct = p => (p>=10||p===0 ? p.toFixed(0) : p<0.1 ? '<0,1' : p.toFixed(1)).replace('.',',')+'%';
+const compactCOP = v => { v=v||0; return v>=1e6 ? '$'+(v/1e6).toLocaleString('es-CO',{maximumFractionDigits: v>=1e9?0:1})+' M' : fmtCOP(v); };
+const esc = s => (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const plural = (n,uno,varios) => fmtN(n)+' '+(n===1?uno:varios);
+const $ = id => document.getElementById(id);
+const DESDE = '2024-01-01';
+const ENT = 'SECRETARIA DE CULTURA VALLE';
+const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const sumV = L => L.reduce((s,c)=>s+c.valor,0);
+
+/* Tooltip: cualquier elemento con data-tip */
+const tip = $('tip');
+document.addEventListener('mousemove', e=>{
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if(!t){ tip.style.display='none'; return; }
+  tip.innerHTML = t.dataset.tip; tip.style.display='block';
+  const w=tip.offsetWidth, h=tip.offsetHeight;
+  let x=e.clientX+14, y=e.clientY+14;
+  if(x+w>innerWidth-8) x=e.clientX-w-14;
+  if(y+h>innerHeight-8) y=e.clientY-h-14;
+  tip.style.left=Math.max(4,x)+'px'; tip.style.top=Math.max(4,y)+'px';
+});
+document.addEventListener('scroll', ()=>{ tip.style.display='none'; }, {passive:true});
+document.addEventListener('touchstart', ()=>{ tip.style.display='none'; }, {passive:true});
+
+/* Colores (fijos por entidad: un filtro nunca repinta lo que queda) */
+const COLOR_EST = {'En ejecución':'#2a78d6','Modificado':'#eb6834','Cerrado':'#1baf7a','Terminado':'#eda100','Aprobado (firmado)':'#e87ba4','Suspendido':'#e34948'};
+const ORDEN_NOV = ['Sin modificaciones','Otra modificación','Con prórroga (sin adición)','Con adición en valor'];
+const COLOR_NOV = {'Sin modificaciones':'#898781','Otra modificación':'#2a78d6','Con prórroga (sin adición)':'#1baf7a','Con adición en valor':'#eb6834'};
+const COLOR_NAT = Object.fromEntries(NU.NATURALEZAS.map(n=>[n.k,n.color]));
+const colorDe = (d,k) => d==='rubro' ? NU.colorRubro(k) : d==='nat' ? (COLOR_NAT[k]||'#898781') : d==='estado' ? (COLOR_EST[k]||'#898781') : d==='novedad' ? (COLOR_NOV[k]||'#898781') : '#2a78d6';
+
+/* ============================================================
+   1. DATOS
+   ============================================================ */
+const D = window.DATOS || {contratos:[],base:{},mods:{},meta:{}};
+const META = D.meta || {};
+let RAW=[], EXCL=[], CAL={}, ANOS=[];
+function setData(contratos, base, mods){
+  const r = NU.construir(contratos, base, mods, DESDE);
+  RAW=r.contratos; EXCL=r.excluidos; CAL=r.calidad;
+  ANOS=[...new Set(RAW.map(c=>String(c.ano)))].sort();
+  console.log(`[datos] ${CAL.filas} filas → ${RAW.length} contratos (${CAL.repId} ids repetidos, ${CAL.dup} duplicados, ${CAL.estado} cancelados/borrador)`);
+}
+
+/* ============================================================
+   2. FILTROS CONCURRENTES
+   Cada dimensión guarda un conjunto (O dentro de la dimensión,
+   Y entre dimensiones). Selects, chips y gráficos tocan los mismos.
+   ============================================================ */
+const DIMS = {
+  ano:{t:'Año'}, mes:{t:'Mes', label:k=>mesLargo(k)}, provKey:{t:'Contratista', label:k=>(RAW.find(c=>c.provKey===k)||{}).provN||k},
+  rubro:{t:'Rubro'}, cat:{t:'Categoría'}, nat:{t:'Naturaleza'}, prog:{t:'Proyecto'}, estado:{t:'Estado'},
+  novedad:{t:'Modificaciones'}, tipo:{t:'Tipo SECOP'}, modalidad:{t:'Modalidad'},
+};
+const mesLargo = k => { const [y,m]=k.split('-'); return MESES[+m-1]+' '+y; };
+const state = {q:'', vmin:null, vmax:null, sel:{}};
+Object.keys(DIMS).forEach(d=>state.sel[d]=new Set());
+const valDim = (c,d) => String(c[d]);
+let metric='v', fmtMode='abs';
+function aplica(ignorar=[]){
+  const q = norm(state.q);
+  return RAW.filter(c=>{
+    for(const d in DIMS) if(!ignorar.includes(d) && state.sel[d].size && !state.sel[d].has(valDim(c,d))) return false;
+    if(state.vmin!=null && c.valor<state.vmin) return false;
+    if(state.vmax!=null && c.valor>state.vmax) return false;
+    if(q && !norm([c.objeto,c.desc,c.prov,c.ref,c.id,c.doc,c.superv,c.cat,c.prog,c.proc].join(' ')).includes(q)) return false;
+    return true;
+  });
+}
+function toggle(d,v){ const s=state.sel[d]; s.has(v)?s.delete(v):s.add(v); page=1; render(); }
+
+/* ============================================================
+   3. GRÁFICOS (SVG / CSS puro)
+   ============================================================ */
+function group(F, keyfn, labelfn){
+  const m=new Map();
+  F.forEach(c=>{ const k=keyfn(c); if(k==null||k==='') return; let o=m.get(k); if(!o){ o={k:String(k),lab:labelfn?labelfn(c):String(k),n:0,v:0}; m.set(k,o);} o.n++; o.v+=c.valor; });
+  return [...m.values()];
+}
+const totDe = rows => ({n:rows.reduce((s,r)=>s+r.n,0), v:rows.reduce((s,r)=>s+r.v,0)});
+function tipHTML(r, tot){
+  return `<b>${esc(r.lab)}</b>
+    <div class="r"><span>Valor contratado</span><span>${fmtCOP(r.v)}</span></div>
+    <div class="r"><span>% del valor</span><span>${fmtPct(tot.v?r.v/tot.v*100:0)}</span></div>
+    <div class="r"><span>Contratos</span><span>${fmtN(r.n)}</span></div>
+    <div class="r"><span>% de los contratos</span><span>${fmtPct(tot.n?r.n/tot.n*100:0)}</span></div>
+    ${r.n?`<div class="r"><span>Promedio por contrato</span><span>${compactCOP(r.v/r.n)}</span></div>`:''}`;
+}
+const lecturas = (r, tot, m=metric, f=fmtMode) => {
+  const pct = tot[m] ? r[m]/tot[m]*100 : 0;
+  const principal = f==='pct' ? fmtPct(pct) : (m==='v' ? compactCOP(r.v) : fmtN(r.n));
+  const secundario = f==='pct' ? (m==='v' ? compactCOP(r.v) : plural(r.n,'contrato','contratos')) : (m==='v' ? fmtPct(pct)+' · '+plural(r.n,'contrato','contratos') : fmtPct(pct)+' · '+compactCOP(r.v));
+  return {pct, principal, secundario};
+};
+function enlazar(el, sel, fn){
+  el.querySelectorAll(sel).forEach(x=>{
+    const go=()=>fn(decodeURIComponent(x.dataset.k));
+    x.addEventListener('click',go);
+    x.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
+  });
+}
+const VACIO = '<div class="vacio">Ningún contrato cumple los filtros actuales.</div>';
+
+/* Barras horizontales: una barra por categoría; color por entidad si se da colorOf */
+function barChart(el, rows, {dim, tot, colorOf, ordenar=true, sw}={}){
+  tot = tot || totDe(rows);
+  const m = metric;
+  if(ordenar) rows=[...rows].sort((a,b)=>b[m]-a[m]||b.v-a.v);
+  if(!rows.length){ el.innerHTML=VACIO; return; }
+  const max=Math.max(...rows.map(r=>r[m]),1), sel=dim?state.sel[dim]:null, haySel=sel&&sel.size;
+  el.innerHTML = rows.map(r=>{
+    const L=lecturas(r,tot), on=haySel&&sel.has(r.k), col=colorOf?colorOf(r):'#2a78d6';
+    return `<div class="bar-row${on?' sel':''}${haySel&&!on?' dim':''}" data-k="${encodeURIComponent(r.k)}" data-tip="${esc(tipHTML(r,tot))}" role="button" tabindex="0" aria-pressed="${on}">
+      <div class="bar-lab">${sw?`<span class="sw" style="background:${col}"></span>`:''}${esc(r.lab)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(r[m]/max*100).toFixed(1)}%;background:${col}"></div></div>
+      <div class="bar-val">${L.principal}<span class="sec">${L.secundario}</span></div></div>`;
+  }).join('');
+  if(dim) enlazar(el,'.bar-row',k=>toggle(dim,k));
+}
+
+/* Columnas verticales (año, mes). Etiquetas de valor selectivas en el mes. */
+function colChart(el, rows, {dim, tot, labs, minw=60, color='#2a78d6', valores=true}={}){
+  tot = tot || totDe(rows);
+  const m=metric;
+  if(!rows.length){ el.innerHTML=VACIO; return; }
+  const max=Math.max(...rows.map(r=>r[m]),1), sel=state.sel[dim], haySel=sel.size;
+  const top = rows.reduce((a,b)=>b[m]>a[m]?b:a, rows[0]);
+  const cols = rows.map(r=>{
+    const L=lecturas(r,tot), on=haySel&&sel.has(r.k);
+    const etiqueta = valores || r===top ? `<div class="cv-val">${L.principal}${valores?`<small>${m==='v'?plural(r.n,'contrato','contratos'):compactCOP(r.v)}</small>`:''}</div>` : '<div class="cv-val">&nbsp;</div>';
+    return `<div class="col-v${on?' sel':''}${haySel&&!on?' dim':''}" data-k="${encodeURIComponent(r.k)}" data-tip="${esc(tipHTML(r,tot))}" role="button" tabindex="0" aria-pressed="${on}" aria-label="${esc(r.lab)}: ${esc(L.principal)}">
+      ${etiqueta}<div class="cv-bar" style="height:calc((100% - 40px) * ${(r[m]/max).toFixed(4)});background:${color}"></div></div>`;
+  }).join('');
+  const lbls = rows.map((r,i)=>`<div class="${haySel&&sel.has(r.k)?'sel':''}">${labs?labs(r,i):esc(r.lab)}</div>`).join('');
+  const mw=`min-width:${rows.length*minw}px`;
+  el.innerHTML=`<div class="colscroll"><div class="cols-v" style="${mw}">${cols}</div><div class="cols-v-lbls" style="${mw}">${lbls}</div></div>`;
+  enlazar(el,'.col-v',k=>toggle(dim,k));
+}
+
+/* Torta (dona) + leyenda con cifras: la leyenda lleva todos los valores,
+   el tooltip solo los amplía. Separación de 2px color superficie. */
+function pieChart(el, rows, {dim, tot, orden, centro}={}){
+  const m=metric;
+  rows = rows.filter(r=>r[m]>0);
+  if(orden) rows.sort((a,b)=>orden.indexOf(a.k)-orden.indexOf(b.k)); else rows.sort((a,b)=>b[m]-a[m]);
+  tot = tot || totDe(rows);
+  if(!rows.length){ el.innerHTML=VACIO; return; }
+  const T=rows.reduce((s,r)=>s+r[m],0)||1, sel=state.sel[dim], haySel=sel.size;
+  const cx=100, cy=100, R=92, r0=56;
+  const pt=(a,rad)=>[(cx+rad*Math.cos(a)).toFixed(2),(cy+rad*Math.sin(a)).toFixed(2)];
+  let a0=-Math.PI/2;
+  const paths = rows.map(r=>{
+    const frac=r[m]/T, col=colorDe(dim,r.k), on=haySel&&sel.has(r.k);
+    let d;
+    if(frac>=0.9999){ d=`M${cx} ${cy-R}A${R} ${R} 0 1 1 ${cx-0.01} ${cy-R}L${cx-0.01} ${cy-r0}A${r0} ${r0} 0 1 0 ${cx} ${cy-r0}Z`; }
+    else{
+      const a1=a0+frac*2*Math.PI, big=frac>0.5?1:0;
+      const [x1,y1]=pt(a0,R),[x2,y2]=pt(a1,R),[x3,y3]=pt(a1,r0),[x4,y4]=pt(a0,r0);
+      d=`M${x1} ${y1}A${R} ${R} 0 ${big} 1 ${x2} ${y2}L${x3} ${y3}A${r0} ${r0} 0 ${big} 0 ${x4} ${y4}Z`;
+      a0=a1;
+    }
+    return `<path d="${d}" fill="${col}" stroke="#fff" stroke-width="2" stroke-linejoin="round" class="${haySel&&!on?'dim':''}" data-k="${encodeURIComponent(r.k)}" data-tip="${esc(tipHTML(r,tot))}" role="button" tabindex="0" aria-label="${esc(r.lab)}: ${fmtPct(r[m]/T*100)}"></path>`;
+  }).join('');
+  const c1 = centro ? centro.v : (m==='v'?compactCOP(tot.v):fmtN(tot.n));
+  const c2 = centro ? centro.t : (m==='v'?'contratado':'contratos');
+  const leg = rows.map(r=>{
+    const on=haySel&&sel.has(r.k), pct=r[m]/T*100;
+    const cifra = m==='v' ? compactCOP(r.v) : plural(r.n,'contrato','contratos');
+    const otra = m==='v' ? plural(r.n,'contrato','contratos') : compactCOP(r.v);
+    const arriba = fmtMode==='pct' ? fmtPct(pct) : cifra;
+    const abajo = fmtMode==='pct' ? cifra+' · '+otra : fmtPct(pct)+' · '+otra;
+    return `<div class="leg-row${on?' sel':''}${haySel&&!on?' dim':''}" data-k="${encodeURIComponent(r.k)}" data-tip="${esc(tipHTML(r,tot))}" role="button" tabindex="0" aria-pressed="${on}">
+      <i style="background:${colorDe(dim,r.k)}"></i><span class="nm">${esc(r.lab)}</span>
+      <span class="vv">${arriba}<small>${abajo}</small></span></div>`;
+  }).join('');
+  el.innerHTML = `<div class="pie"><svg viewBox="-4 -4 208 208" role="img" aria-label="Gráfico de torta">${paths}
+      <text x="100" y="99" text-anchor="middle" class="c1">${esc(c1)}</text><text x="100" y="117" text-anchor="middle" class="c2">${esc(c2)}</text></svg>
+    <div class="leg">${leg}</div></div>`;
+  enlazar(el,'path',k=>toggle(dim,k));
+  enlazar(el,'.leg-row',k=>toggle(dim,k));
+}
+
+/* ============================================================
+   4. VISTAS
+   ============================================================ */
+function render(){
+  const F=aplica(), tot={n:F.length, v:sumV(F)};
+  renderKPIs(F,tot); renderChips(); syncControls();
+  $('m-resumen').textContent=`Seleccionado: ${plural(F.length,'contrato','contratos')} · ${compactCOP(tot.v)}`;
+  // el reparto ignora sus propios filtros (rubro y categoría): lo elegido se resalta sin perder el contexto
+  const FG=aplica(['rubro','cat']);
+  renderGasto(FG,{n:FG.length,v:sumV(FG)});
+  renderHallazgos(F,tot);
+  const FN=aplica(['nat']); pieChart($('pie-nat'), group(FN,c=>c.nat), {dim:'nat', orden:NU.NATURALEZAS.map(n=>n.k)});
+  const FE=aplica(['estado']); pieChart($('pie-est'), group(FE,c=>c.estado), {dim:'estado'});
+  const hoy=new Date().toISOString().slice(0,10), abiertos=F.filter(c=>!/Cerrado|Terminado/.test(c.estado)), venc=abiertos.filter(c=>c.fin&&c.fin<hoy);
+  $('est-nota').textContent = venc.length ? `Ojo: ${plural(venc.length,'contrato','contratos')} de ${fmtN(abiertos.length)} sin cerrar en SECOP ya pasaron su fecha de fin. El estado lo reporta la entidad y puede estar desactualizado.` : '';
+  // Top 15 por valor, color = rubro principal del contratista
+  const provs=group(F,c=>c.provKey,c=>c.provN).sort((a,b)=>b.v-a.v).slice(0,15);
+  const rubP={}; F.forEach(c=>{ const o=(rubP[c.provKey]=rubP[c.provKey]||{}); o[c.rubro]=(o[c.rubro]||0)+c.valor; });
+  const rubroPrincipal = k => Object.entries(rubP[k]||{}).sort((a,b)=>b[1]-a[1])[0]?.[0];
+  barChart($('chart-prov'), provs, {dim:'provKey', tot, ordenar:false, sw:true, colorOf:r=>NU.colorRubro(rubroPrincipal(r.k))});
+  const FA=aplica(['ano']); colChart($('chart-ano'), group(FA,c=>c.ano).sort((a,b)=>a.k-b.k), {dim:'ano', minw:70});
+  const FNo=aplica(['novedad']); pieChart($('pie-nov'), group(FNo,c=>c.novedad), {dim:'novedad', orden:ORDEN_NOV});
+  const FM=aplica(['mes']);
+  colChart($('chart-mes'), group(FM,c=>c.mes,c=>mesLargo(c.mes)).sort((a,b)=>a.k.localeCompare(b.k)), {dim:'mes', minw:30, valores:false,
+    labs:(r,i)=>{ const [y,mm]=r.k.split('-'); return MESES[+mm-1]+(i===0||mm==='01'?`<br><b>${y}</b>`:''); }});
+  barChart($('chart-prog'), group(F,c=>c.prog), {dim:'prog', tot, colorOf:()=>'#6250d6'});
+  barChart($('chart-tipo'), group(F,c=>c.tipo), {dim:'tipo', tot});
+  const mal = F.filter(c=>/^(Suministros|Obra|Compraventa)$/.test(c.tipo) && !/Compra/.test(c.nat));
+  $('tipo-nota').innerHTML = `«Otro» suele ser un convenio. ${mal.length?`Ojo: SECOP etiqueta como «Suministros» u «Obra» ${plural(mal.length,'contrato','contratos')} (${compactCOP(sumV(mal))}) que, por su objeto, son convenios para programas culturales. No hay obras públicas.`:''}`;
+  barChart($('chart-moda'), group(F,c=>c.modalidad), {dim:'modalidad', tot, colorOf:()=>'#1c5cab'});
+  renderFuente(F); renderTable(F);
+}
+
+function renderKPIs(F,tot){
+  const totAll=sumV(RAW), adic=F.filter(c=>c.adic>0), vAd=adic.reduce((s,c)=>s+c.adic,0), mod=F.filter(c=>c.nMod>0);
+  const pv=new Set(F.map(c=>c.provKey)), vs=F.map(c=>c.valor).sort((a,b)=>a-b);
+  const ops=F.filter(c=>c.cat.startsWith('OPS'));
+  const K=[
+    ['Contratos', fmtN(F.length), F.length===RAW.length?'todos los contratos depurados':`${fmtPct(F.length/RAW.length*100)} de ${fmtN(RAW.length)}`, '#1c5cab'],
+    ['Valor contratado', compactCOP(tot.v), F.length===RAW.length?fmtCOP(tot.v):`${fmtPct(totAll?tot.v/totAll*100:0)} del total`, '#2a78d6'],
+    ['Valor promedio', compactCOP(F.length?tot.v/F.length:0), vs.length?`mediana ${compactCOP(vs[Math.floor((vs.length-1)/2)])}`:'', '#1baf7a'],
+    ['Contratistas', fmtN(pv.size), pv.size?`${(F.length/pv.size).toFixed(1).replace('.',',')} contratos c/u`:'', '#6250d6'],
+    ['Adicionado (estimado)', compactCOP(vAd), `${plural(adic.length,'contrato','contratos')} · ${fmtPct(tot.v?vAd/tot.v*100:0)} del valor`, '#eb6834'],
+    ['Personas por OPS', fmtN(ops.length), F.length?`${fmtPct(ops.length/F.length*100)} de los contratos · ${fmtPct(tot.v?sumV(ops)/tot.v*100:0)} del valor`:'', '#eda100'],
+  ];
+  $('kpis').innerHTML = K.map(([l,v,n,c])=>`<div class="kpi" style="--kc:${c}"><div class="lab">${l}</div><div class="val">${v}</div><div class="nota">${n}</div></div>`).join('');
+}
+
+function renderLead(){
+  const tot=sumV(RAW); if(!RAW.length){ $('lead').textContent='Sin datos.'; return; }
+  const conv=RAW.filter(c=>!c.cat.startsWith('OPS')), ops=RAW.filter(c=>c.cat.startsWith('OPS'));
+  const porProv=group(RAW,c=>c.provKey,c=>c.provN).sort((a,b)=>b.v-a.v), p1=porProv[0];
+  const top=[...RAW].sort((a,b)=>b.valor-a.valor)[0];
+  $('lead').innerHTML = `Desde enero de 2024 la Secretaría de Cultura firmó <b>${plural(RAW.length,'contrato','contratos')}</b> por <b>${compactCOP(tot)}</b>. `+
+    `Los <b>${fmtN(conv.length)} convenios y contratos con entidades</b> se llevan el <b>${fmtPct(sumV(conv)/tot*100)}</b> del valor; `+
+    `los ${fmtN(ops.length)} contratos de prestación de servicios con personas (${fmtPct(ops.length/RAW.length*100)} de los contratos) suman el ${fmtPct(sumV(ops)/tot*100)}. `+
+    `Solo <b>${esc(p1.lab)}</b> recibió <b>${compactCOP(p1.v)}</b> (${fmtPct(p1.v/tot*100)} del total). `+
+    `El contrato más grande es de ${esc(top.provN)} por ${compactCOP(top.valor)}, firmado el ${top.firma}: ${esc(top.objeto.toLowerCase().slice(0,120))}…`;
+}
+
+/* ¿En qué se gastó? Dona por rubro + desglose por categoría */
+function renderGasto(F, tot){
+  const m=metric, T=tot[m]||1;
+  const rows=NU.RUBROS.map(r=>{ const L=F.filter(c=>c.rubro===r.k); return {k:r.k, lab:r.k, n:L.length, v:sumV(L), subs:group(L,c=>c.cat).sort((a,b)=>b[m]-a[m]||b.v-a.v)}; }).filter(r=>r.n);
+  pieChart($('pie-rubro'), rows.map(r=>({k:r.k,lab:r.lab,n:r.n,v:r.v})), {dim:'rubro', tot, orden:NU.RUBROS.map(r=>r.k)});
+  const orden=[...rows].sort((a,b)=>b[m]-a[m]);
+  let frase='';
+  if(orden.length){
+    const p=r=>Math.round(r[m]/T*100);
+    frase = (m==='v'?'De cada 100 pesos contratados, ':'De cada 100 contratos, ')+`<b>${p(orden[0])}</b> ${m==='v'?'se fueron en':'son de'} <b>${esc(orden[0].k.toLowerCase())}</b>`;
+    if(orden[1]) frase+=`, <b>${p(orden[1])}</b> en <b>${esc(orden[1].k.toLowerCase())}</b>`;
+    if(orden[2]) frase+=` y <b>${p(orden[2])}</b> en <b>${esc(orden[2].k.toLowerCase())}</b>`;
+    frase+='. ';
+    const topCat=group(F,c=>c.cat).sort((a,b)=>b.v-a.v)[0];
+    if(m==='v' && topCat && tot.v) frase+=`La categoría más grande es «${esc(topCat.k)}»: ${compactCOP(topCat.v)} en ${plural(topCat.n,'contrato','contratos')}.`;
+    if(m==='n'){ const ops=F.filter(c=>c.cat.startsWith('OPS')); if(F.length) frase+=`Las prestaciones de servicios con persona natural son el ${fmtPct(ops.length/F.length*100)} de los contratos, pero el ${fmtPct(tot.v?sumV(ops)/tot.v*100:0)} del valor.`; }
+  }
+  $('gasto-lead').innerHTML = frase || 'Ningún contrato cumple los filtros actuales.';
+  const maxSub=Math.max(...rows.flatMap(r=>r.subs.map(s=>s[m])),1), selR=state.sel.rubro, selC=state.sel.cat;
+  $('gasto-cats').innerHTML = orden.map(r=>{
+    const col=NU.colorRubro(r.k);
+    const subs=r.subs.map(s=>{
+      const L=lecturas(s,tot);
+      return `<div class="gsub${selC.has(s.k)?' on':''}" data-k="${encodeURIComponent(s.k)}" data-tip="${esc(tipHTML(s,tot))}" role="button" tabindex="0">
+        <span class="sl">${esc(s.lab)}</span><span class="sv">${L.principal}<small>${m==='v'?plural(s.n,'contrato','contratos'):compactCOP(s.v)}</small></span>
+        <span class="st"><span style="width:${(s[m]/maxSub*100).toFixed(1)}%;background:${col}"></span></span></div>`;
+    }).join('');
+    return `<div class="rubro"><div class="rubro-h${selR.has(r.k)?' on':''}" data-r="${encodeURIComponent(r.k)}" data-tip="${esc(tipHTML(r,tot))}" role="button" tabindex="0">
+      <i style="background:${col}"></i><span class="nm">${esc(r.k)}</span><span class="pc">${fmtPct(r[m]/T*100)}</span></div>${subs}</div>`;
+  }).join('') || VACIO;
+  enlazar($('gasto-cats'),'.gsub',k=>toggle('cat',k));
+  $('gasto-cats').querySelectorAll('.rubro-h').forEach(h=>{
+    const go=()=>toggle('rubro',decodeURIComponent(h.dataset.r));
+    h.addEventListener('click',go); h.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
+  });
+}
+
+function renderHallazgos(F, tot){
+  const H=[];
+  if(!F.length){ $('hallazgos').innerHTML='<li>Ningún contrato cumple los filtros actuales.</li>'; return; }
+  const provs=group(F,c=>c.provKey,c=>c.provN).sort((a,b)=>b.v-a.v);
+  const top4=provs.slice(0,4), v4=top4.reduce((s,r)=>s+r.v,0);
+  if(provs.length>4) H.push(`<b>Concentración:</b> ${top4.map(p=>esc(p.lab)).join(', ')} reciben el <b>${fmtPct(v4/tot.v*100)}</b> del valor (${compactCOP(v4)}), entre ${fmtN(provs.length)} contratistas.`);
+  else if(provs.length) H.push(`<b>Contratistas:</b> ${provs.map(p=>`${esc(p.lab)} (${compactCOP(p.v)})`).join(', ')}.`);
+  const dir=F.filter(c=>/directa/i.test(c.modalidad));
+  H.push(`<b>Contratación directa:</b> el ${fmtPct(dir.length/F.length*100)} de los contratos (${fmtPct(tot.v?sumV(dir)/tot.v*100:0)} del valor) se adjudicó por contratación directa, sin concurso entre oferentes.`);
+  const ad=F.filter(c=>c.adic>0), vAd=ad.reduce((s,c)=>s+c.adic,0);
+  if(ad.length){ const mx=ad.sort((a,b)=>b.adic-a.adic)[0];
+    H.push(`<b>Adiciones:</b> ${plural(ad.length,'contrato recibió','contratos recibieron')} adición en valor por cerca de <b>${compactCOP(vAd)}</b> (${fmtPct(vAd/tot.v*100)} del valor). La mayor: ${esc(mx.provN)}, +${compactCOP(mx.adic)} sobre un precio base de ${compactCOP(mx.base)}.`); }
+  const pr=F.filter(c=>c.diasAd>0); if(pr.length) H.push(`<b>Prórrogas:</b> ${plural(pr.length,'contrato tiene','contratos tienen')} días adicionados (${fmtN(pr.reduce((s,c)=>s+c.diasAd,0))} días en total).`);
+  const rep={}; F.forEach(c=>{ if(c.cat.startsWith('OPS')){ const k=c.provKey+'|'+norm(c.objeto); rep[k]=(rep[k]||[]); rep[k].push(c);} });
+  const rr=Object.values(rep).filter(L=>L.length>=3), personas=new Set(rr.map(L=>L[0].provKey));
+  if(rr.length){ const mx=rr.sort((a,b)=>b.length-a.length)[0];
+    H.push(`<b>Contratos sucesivos:</b> ${plural(personas.size,'persona firmó','personas firmaron')} 3 o más contratos de prestación de servicios con el mismo objeto (contratos cortos que se renuevan). El caso con más: ${esc(mx[0].provN)}, ${mx.length} contratos por ${compactCOP(sumV(mx))}.`); }
+  const venc=F.filter(c=>!/Cerrado|Terminado/.test(c.estado) && c.fin && c.fin<new Date().toISOString().slice(0,10));
+  if(venc.length) H.push(`<b>Estados desactualizados:</b> ${plural(venc.length,'contrato sigue','contratos siguen')} abiertos en SECOP aunque su fecha de fin ya pasó.`);
+  const liq=F.filter(c=>c.liquidado==='Sí'); H.push(`<b>Liquidación:</b> ${plural(liq.length,'contrato aparece liquidado','contratos aparecen liquidados')} en SECOP (${fmtPct(liq.length/F.length*100)}).`);
+  $('hallazgos').innerHTML=H.map(h=>`<li>${h}</li>`).join('');
+}
+
+function renderFuente(F){
+  const conF=F.filter(c=>c.conFin);
+  const rows=NU.FUENTES.map(([nm],i)=>({k:nm,lab:nm,v:conF.reduce((s,c)=>s+c['f'+i],0),n:conF.filter(c=>c['f'+i]>0).length})).filter(r=>r.v>0);
+  const vF=rows.reduce((s,r)=>s+r.v,0), vT=sumV(F);
+  $('fuente-cob').textContent=`— reportado en ${fmtN(conF.length)} de ${fmtN(F.length)} contratos; cubre ${compactCOP(vF)} de ${compactCOP(vT)} (${fmtPct(vT?vF/vT*100:0)})`;
+  if(!rows.length){ $('chart-fuente').innerHTML='<div class="vacio">Los contratos filtrados no reportan fuente de financiación.</div>'; return; }
+  barChart($('chart-fuente'), rows, {colorOf:()=>'#1baf7a'});
+}
+
+/* --- depuración --- */
+function renderDepuracion(){
+  const dup=EXCL.filter(e=>e.motivo.startsWith('Duplicado')||e.motivo.startsWith('ID')), est=EXCL.filter(e=>e.motivo.startsWith('Estado')), otros=EXCL.filter(e=>!dup.includes(e)&&!est.includes(e));
+  const vDup=sumV(dup);
+  $('dep-pasos').innerHTML = `
+    <div class="paso"><b>${fmtN(CAL.filas)}</b> registros descargados</div><span class="flecha">→</span>
+    <div class="paso"><span class="badge ${dup.length?'warn':'ok'}">${plural(dup.length,'duplicado','duplicados')} fuera${dup.length?' · '+compactCOP(vDup):''}</span></div>
+    <div class="paso"><span class="badge ${est.length?'warn':'ok'}">${fmtN(est.filter(e=>/cancel/i.test(e.motivo)).length)} cancelados · ${fmtN(est.filter(e=>/borrador/i.test(e.motivo)).length)} borradores</span></div>
+    ${otros.length?`<div class="paso"><span class="badge warn">${fmtN(otros.length)} sin fecha de firma</span></div>`:''}
+    <span class="flecha">→</span><div class="paso"><b>${fmtN(RAW.length)}</b> contratos analizados</div>`;
+  const filas = EXCL.map(e=>`<tr><td>${esc(e.ref||e.id)}<div class="doc">${esc(e.id)}</div></td><td>${esc(e.prov)}</td><td class="num">${fmtCOP(e.valor)}</td><td>${e.firma||'—'}</td><td>${esc(e.estado0)}</td><td>${esc(e.motivo)}${e.queda?`<div class="doc">se conserva ${esc(e.queda)}</div>`:''}</td><td>${btnSecop(e.url)}</td></tr>`).join('');
+  const rp = (META.rpmrSolo||[]);
+  $('dep-detalle').innerHTML = (EXCL.length?`<div class="tblwrap"><table class="plain"><thead><tr><th>Nº contrato</th><th>Contratista</th><th class="num">Valor</th><th>Firma</th><th>Estado</th><th>Motivo</th><th></th></tr></thead><tbody>${filas}</tbody></table></div>`:'<p class="muted">No hubo registros excluidos.</p>')+
+    `<p class="expl">Los cuatro duplicados de enero de 2024 se firmaron el 22-ene y se terminaron porque, según SECOP, la ordenadora del gasto asignada no tenía competencia («no tiene vida jurídica»); al día siguiente se firmaron de nuevo con el mismo número, contratista, objeto y valor.</p>`+
+    (rp.length?`<p class="expl"><b>Verificación con SECOP Integrado (rpmr-utcd):</b> trae ${plural(rp.length,'contrato','contratos')} de la entidad que no están en el dataset de contratos (${compactCOP(rp.reduce((s,r)=>s+r.valor,0))}): ${rp.map(r=>`${esc(r.prov)} (${compactCOP(r.valor)}, ${r.firma})`).join('; ')}. ${rp.every(r=>!r.enJbjy&&!r.enP6dx)?'Ninguno existe ya en SECOP II (ni como contrato ni como proceso), así que se tratan como registros anulados o reemplazados y no se suman.':''}</p>`:'')+
+    `<div class="btns" style="margin-top:8px"><button class="act" id="b-excl">⬇ Excluidos (CSV)</button></div>`;
+  $('b-excl').onclick=()=>descargarCSV('registros_excluidos_cultura_valle.csv',
+    ['ID contrato','Nº contrato','Contratista','Documento','Valor','Firma','Estado','Motivo','Se conserva','URL SECOP'],
+    EXCL.map(e=>[e.id,e.ref,e.prov,e.doc,e.valor,e.firma,e.estado0,e.motivo,e.queda,e.url]));
+}
+
+/* --- tabla con columnas dinámicas --- */
+const btnSecop = u => u ? `<a class="btn-secop" href="${esc(u)}" target="_blank" rel="noopener" title="Abrir el proceso en SECOP II">SECOP ↗</a>` : '—';
+const tagCat = c => `<span class="tag" style="background:${NU.colorRubro(c.rubro)};${c.rubro==='Bibliotecas y lectura'?'color:#0b0b0b':''}">${esc(c.cat)}</span>`;
+const COLS = [
+  {k:'ref', t:'Nº de contrato', def:1, cls:'ref', html:c=>`${esc(c.ref)||'—'}`},
+  {k:'provN', t:'Contratista', def:1, cls:'prv', html:c=>`${esc(c.provN)}<div class="doc">${esc(c.tdoc?c.tdoc+' ':'')}${esc(c.doc)}</div>`},
+  {k:'objeto', t:'Objeto', def:1, cls:'obj', html:c=>esc(c.objeto)||'—'},
+  {k:'valor', t:'Valor', def:1, num:1, html:c=>fmtCOP(c.valor)},
+  {k:'firma', t:'Firma', def:1, cls:'num'},
+  {k:'inicio', t:'Inicio', def:1, cls:'num'},
+  {k:'fin', t:'Fin', def:1, cls:'num'},
+  {k:'adic', t:'Adiciones', def:1, num:1, html:c=> (c.adic>0?`<span class="adic">+${fmtCOP(c.adic)}</span><div class="doc">inicial ${compactCOP(c.valorIni)}</div>`:'')+(c.diasAd>0?`<div class="doc">+${fmtN(c.diasAd)} días</div>`:'') || '—'},
+  {k:'nMod', t:'Modificaciones', def:1, num:1, html:c=>`<button class="modb${c.mods.length?'':' cero'}" data-id="${esc(c.id)}" ${c.mods.length?'':'disabled'} aria-expanded="${abiertos.has(c.id)}">${fmtN(c.nMod)}${c.mods.length?(abiertos.has(c.id)?' ▴':' ▾'):''}</button>`},
+  {k:'cat', t:'Categoría', html:tagCat},
+  {k:'rubro', t:'Rubro'},
+  {k:'nat', t:'Naturaleza'},
+  {k:'estado', t:'Estado', html:c=>`<span class="estado" style="box-shadow:inset 3px 0 0 ${COLOR_EST[c.estado]||'#898781'}">${esc(c.estado)}</span>`},
+  {k:'tipo', t:'Tipo SECOP'},
+  {k:'modalidad', t:'Modalidad'},
+  {k:'justif', t:'Justificación'},
+  {k:'prog', t:'Proyecto de inversión'},
+  {k:'valorIni', t:'Valor inicial (estimado)', num:1, html:c=>fmtCOP(c.valorIni)},
+  {k:'diasAd', t:'Días adicionados', num:1, html:c=>c.diasAd>0?fmtN(c.diasAd):'—'},
+  {k:'duracion', t:'Duración'},
+  {k:'superv', t:'Supervisor'},
+  {k:'ordenador', t:'Ordenador del gasto'},
+  {k:'repLegal', t:'Representante legal'},
+  {k:'destino', t:'Destino del gasto'},
+  {k:'liquidado', t:'Liquidado'},
+  {k:'repite', t:'Contratos con el mismo objeto', num:1},
+  {k:'id', t:'ID contrato', cls:'ref'},
+  {k:'url', t:'SECOP', def:1, fijo:1, nosort:1, html:c=>btnSecop(c.url)},
+];
+const COLS_KEY='cultura-valle-columnas-v1';
+let visibles=new Set(COLS.filter(c=>c.def).map(c=>c.k));
+try{ const g=JSON.parse(localStorage.getItem(COLS_KEY)||'null'); if(Array.isArray(g)&&g.length) visibles=new Set(g.filter(k=>COLS.some(c=>c.k===k)).concat(['url'])); }catch(e){}
+const guardarCols=()=>{ try{ localStorage.setItem(COLS_KEY, JSON.stringify([...visibles])); }catch(e){} };
+const nCols=()=>[...visibles].filter(k=>k!=='url').length;
+const abiertos=new Set();
+function renderColsPanel(){
+  $('cols-panel').innerHTML=COLS.filter(c=>!c.fijo).map(c=>`<label><input type="checkbox" data-k="${c.k}" ${visibles.has(c.k)?'checked':''}> ${c.t}</label>`).join('')+
+    `<div class="acc"><button id="cols-def">Restablecer</button><button id="cols-todas">Todas</button><button id="cols-min">Mínimas</button></div>`;
+  $('cols-n').textContent=nCols();
+  $('cols-panel').querySelectorAll('input').forEach(i=>i.addEventListener('change',()=>{ i.checked?visibles.add(i.dataset.k):visibles.delete(i.dataset.k); guardarCols(); $('cols-n').textContent=nCols(); renderTable(FILTERED); }));
+  const set=ks=>{ visibles=new Set(ks); guardarCols(); renderColsPanel(); renderTable(FILTERED); };
+  $('cols-def').onclick=()=>set(COLS.filter(c=>c.def).map(c=>c.k));
+  $('cols-todas').onclick=()=>set(COLS.map(c=>c.k));
+  $('cols-min').onclick=()=>set(['ref','provN','valor','url']);
+}
+let sortKey='valor', sortDir=-1, page=1, PER=50, FILTERED=[];
+function fillSort(){
+  $('sort-sel').innerHTML=COLS.filter(c=>!c.nosort).map(c=>`<option value="${c.k}">${c.t}</option>`).join('');
+}
+function setSort(k){ if(sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=(COLS.find(c=>c.k===k)||{}).num||['firma','inicio','fin'].includes(k)?-1:1; } page=1; renderTable(FILTERED); }
+function detalle(c){
+  const M=c.mods.length?`<ul class="modlist">${c.mods.map(m=>`<li class="${m.t==='Adicion en el valor'||/adici/i.test(norm(m.d))?'adi':NU.ES_MODIF(m.t)?'mod':''}"><b>${esc(NU.MOD_NOMBRE[m.t]||m.t)}</b> <span class="f">${m.f}</span><div>${esc(m.d)||'<span class="muted">sin descripción</span>'}</div></li>`).join('')}</ul>`:'<p class="muted">Sin modificaciones registradas.</p>';
+  const kv=[['Valor actual',fmtCOP(c.valor)],['Precio base del proceso',c.base?fmtCOP(c.base):'—'],['Adición estimada',c.adic?fmtCOP(c.adic):'—'],['Días adicionados',c.diasAd?fmtN(c.diasAd):'—'],['Categoría',c.cat],['Naturaleza',c.nat],['Estado',c.estado],['Supervisor',c.superv||'—'],['Ordenador del gasto',c.ordenador||'—'],['Proceso',c.proc||'—'],['ID contrato',c.id]];
+  return `<div class="detgrid"><div><h4>Modificaciones registradas en SECOP II (${fmtN(c.mods.length)})</h4>${M}</div><div><h4>Ficha</h4><div class="kv">${kv.map(([a,b])=>`<span>${a}</span><span>${esc(b)}</span>`).join('')}</div></div></div>`;
+}
+function renderTable(F){
+  FILTERED=F;
+  const cols=COLS.filter(c=>visibles.has(c.k));
+  $('thead').innerHTML=cols.map(c=>`<th data-k="${c.k}" class="${c.num?'num ':''}${c.nosort?'':'sort'}" ${c.nosort?'':'tabindex="0"'} ${sortKey===c.k?`aria-sort="${sortDir<0?'descending':'ascending'}"`:''}>${c.t}<span class="arr">${sortKey===c.k?(sortDir<0?' ▼':' ▲'):''}</span></th>`).join('');
+  $('thead').querySelectorAll('th.sort').forEach(h=>{ const go=()=>setSort(h.dataset.k); h.addEventListener('click',go); h.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); }); });
+  $('sort-sel').value=sortKey; $('sort-dir').textContent=sortDir<0?'↓':'↑';
+  const numK=(COLS.find(c=>c.k===sortKey)||{}).num;
+  const sorted=[...F].sort((a,b)=> numK ? ((+a[sortKey]||0)-(+b[sortKey]||0))*sortDir || b.valor-a.valor : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'es')*sortDir || b.valor-a.valor);
+  const pages=Math.max(1,Math.ceil(sorted.length/PER)); if(page>pages) page=pages;
+  const slice=window.__printAll?sorted:sorted.slice((page-1)*PER,page*PER);
+  $('tbody').innerHTML=slice.map(c=>`<tr class="fila">${cols.map(col=>`<td data-l="${esc(col.t)}" class="${col.num?'num ':''}${col.cls||''}"><div>${col.html?col.html(c):(esc(c[col.k])||'—')}</div></td>`).join('')}</tr>`+
+      (abiertos.has(c.id)?`<tr class="det"><td colspan="${cols.length}">${detalle(c)}</td></tr>`:'')).join('')
+    || `<tr class="fila"><td colspan="${cols.length}" class="vacio">Ningún contrato cumple los filtros actuales. Quita alguno con la ✕ o usa «Limpiar filtros».</td></tr>`;
+  $('tbody').querySelectorAll('.modb:not(.cero)').forEach(b=>b.addEventListener('click',()=>{ const id=b.dataset.id; abiertos.has(id)?abiertos.delete(id):abiertos.add(id); renderTable(FILTERED); }));
+  $('tbl-count').textContent=`— ${plural(F.length,'contrato','contratos')} · ${fmtCOP(sumV(F))} · toca el número de modificaciones para ver el detalle`;
+  $('pg-info').textContent=`Mostrando ${fmtN(slice.length)} de ${fmtN(sorted.length)}`;
+  $('pg-cur').textContent=`${page} / ${pages}`;
+  $('pg-prev').disabled=page<=1; $('pg-next').disabled=page>=pages;
+}
+
+/* --- chips de filtros activos --- */
+function renderChips(){
+  const chips=[], add=(lab,val,acc)=>chips.push(`<span class="chip"><b>${esc(lab)}:</b> <span class="t" title="${esc(val)}">${esc(val)}</span><button class="x" data-acc="${esc(acc)}" aria-label="Quitar filtro">✕</button></span>`);
+  if(state.q) add('Buscar',state.q,'q');
+  for(const d in DIMS) state.sel[d].forEach(v=>add(DIMS[d].t, DIMS[d].label?DIMS[d].label(v):v, 'sel|'+d+'|'+v));
+  if(state.vmin!=null) add('Valor ≥',fmtCOP(state.vmin),'vmin');
+  if(state.vmax!=null) add('Valor ≤',fmtCOP(state.vmax),'vmax');
+  $('chips').innerHTML=chips.length?'<span class="lbl">Filtros activos:</span>'+chips.join(''):'';
+  $('fcount').hidden=!chips.length; $('fcount').textContent=chips.length;
+  $('chips').querySelectorAll('.x').forEach(x=>x.addEventListener('click',()=>{
+    const a=x.dataset.acc;
+    if(a.startsWith('sel|')){ const [,d,...v]=a.split('|'); state.sel[d].delete(v.join('|')); }
+    else if(a==='vmin'||a==='vmax'){ state[a]=null; $('f-'+a.slice(1)).value=''; }
+    else { state.q=''; $('f-q').value=''; }
+    page=1; render();
+  }));
+}
+
+/* --- controles --- */
+const SELECTS={'f-rubro':'rubro','f-cat':'cat','f-nat':'nat','f-prog':'prog','f-est':'estado','f-nov':'novedad','f-tipo':'tipo','f-mod':'modalidad'};
+function fillSelects(){
+  for(const id in SELECTS){
+    const d=SELECTS[id], cuenta={};
+    RAW.forEach(c=>{ const v=valDim(c,d); if(v) cuenta[v]=(cuenta[v]||0)+1; });
+    const vals=Object.keys(cuenta).sort((a,b)=>a.localeCompare(b,'es'));
+    $(id).innerHTML=`<option value="">Todos</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)} (${fmtN(cuenta[v])})</option>`).join('');
+  }
+  const provs={}; RAW.forEach(c=>{ provs[c.provN]=1; });
+  $('dl-prov').innerHTML=Object.keys(provs).sort((a,b)=>a.localeCompare(b,'es')).map(p=>`<option value="${esc(p)}"></option>`).join('');
+  $('f-anos').innerHTML=ANOS.map(y=>`<button type="button" data-y="${y}" aria-pressed="false">${y}</button>`).join('');
+  $('f-anos').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>toggle('ano',b.dataset.y)));
+}
+function syncControls(){
+  for(const id in SELECTS){
+    const s=state.sel[SELECTS[id]], el=$(id);
+    el.value=s.size===1?[...s][0]:'';
+    el.options[0].textContent=s.size>1?`${s.size} seleccionados`:'Todos';
+  }
+  $('f-anos').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',state.sel.ano.has(b.dataset.y)));
+}
+function refreshControls(){
+  $('m-nit').textContent=META.nit||'890399029';
+  $('m-n').textContent=fmtN(RAW.length);
+  $('m-dl').textContent=META.descargado||'';
+  const f=RAW.map(c=>c.firma).sort();
+  $('m-per').textContent=(f[0]||'')+' y '+(f[f.length-1]||'');
+  for(const d in DIMS){ const ok=new Set(RAW.map(c=>valDim(c,d))); [...state.sel[d]].forEach(v=>{ if(!ok.has(v)) state.sel[d].delete(v); }); }
+  fillSelects(); syncControls();
+  $('meth-ent').textContent=ENT;
+  $('meth-q').textContent=META.consulta||'';
+  const rows=group(RAW,c=>c.rubro+' › '+c.cat).sort((a,b)=>b.v-a.v), tt=sumV(RAW);
+  $('meth-tbl').innerHTML='<thead><tr><th>Rubro › categoría</th><th class="num">Contratos</th><th class="num">Valor</th><th class="num">%</th></tr></thead><tbody>'+
+    rows.map(r=>`<tr><td>${esc(r.k)}</td><td class="num">${fmtN(r.n)}</td><td class="num">${fmtCOP(r.v)}</td><td class="num">${fmtPct(r.v/tt*100)}</td></tr>`).join('')+'</tbody>';
+}
+function initControls(){
+  let dt;
+  $('f-q').addEventListener('input',e=>{ clearTimeout(dt); dt=setTimeout(()=>{ state.q=e.target.value.trim(); page=1; render(); },250); });
+  for(const id in SELECTS) $(id).addEventListener('change',e=>{ const d=SELECTS[id]; if(e.target.value==='') state.sel[d].clear(); else state.sel[d].add(e.target.value); page=1; render(); });
+  const elegirProv=()=>{ const v=$('f-prov').value.trim(); if(!v) return; const c=RAW.find(x=>x.provN===v)||RAW.find(x=>x.provKey===norm(v)); if(c){ state.sel.provKey.add(c.provKey); $('f-prov').value=''; page=1; render(); } };
+  $('f-prov').addEventListener('change',elegirProv);
+  $('f-prov').addEventListener('keydown',e=>{ if(e.key==='Enter') elegirProv(); });
+  ['min','max'].forEach(k=>$('f-'+k).addEventListener('input',e=>{ clearTimeout(dt); dt=setTimeout(()=>{ state['v'+k]=e.target.value===''?null:+e.target.value; page=1; render(); },300); }));
+  document.querySelectorAll('[data-metric]').forEach(b=>b.addEventListener('click',()=>{ metric=b.dataset.metric; document.querySelectorAll('[data-metric]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render(); }));
+  document.querySelectorAll('[data-fmt]').forEach(b=>b.addEventListener('click',()=>{ fmtMode=b.dataset.fmt; document.querySelectorAll('[data-fmt]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render(); }));
+  $('pg-per').addEventListener('change',e=>{ PER=+e.target.value; page=1; renderTable(FILTERED); });
+  $('pg-prev').onclick=()=>{ page--; renderTable(FILTERED); $('tabla').scrollIntoView({block:'start'}); };
+  $('pg-next').onclick=()=>{ page++; renderTable(FILTERED); $('tabla').scrollIntoView({block:'start'}); };
+  $('sort-sel').addEventListener('change',e=>{ sortKey=''; setSort(e.target.value); });
+  $('sort-dir').onclick=()=>{ sortDir*=-1; page=1; renderTable(FILTERED); };
+  $('b-clr').onclick=()=>{ Object.assign(state,{q:'',vmin:null,vmax:null}); for(const d in DIMS) state.sel[d].clear(); $('f-q').value=''; $('f-min').value=''; $('f-max').value=''; page=1; render(); };
+  $('b-csv').onclick=exportCSV;
+  $('b-pdf').onclick=exportPDF;
+  $('ftoggle').onclick=()=>{ const o=$('filterbar').classList.toggle('open'); $('ftoggle').setAttribute('aria-expanded',o); $('ftoggle-ic').textContent=o?'▴':'▾'; };
+  document.addEventListener('click',e=>{ const d=document.querySelector('details.cols'); if(d.open && !d.contains(e.target)) d.open=false; });
+}
+
+/* --- exportar --- */
+function descargarCSV(nombre, head, rows){
+  const q=v=>'"'+(v==null?'':String(v)).replace(/"/g,'""')+'"';
+  const lines=[head.map(q).join(';')].concat(rows.map(r=>r.map(q).join(';')));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'}));
+  a.download=nombre; document.body.appendChild(a); a.click(); a.remove();
+}
+function exportCSV(){
+  const cols=COLS.filter(c=>visibles.has(c.k)&&c.k!=='url');
+  descargarCSV('contratos_cultura_valle.csv', cols.map(c=>c.t).concat(['Documento contratista','URL SECOP']),
+    FILTERED.map(c=>cols.map(col=>col.k==='adic'?c.adic:c[col.k]).concat([c.doc,c.url])));
+}
+function exportPDF(){
+  window.__printAll=true; renderTable(FILTERED);
+  const restore=()=>{ window.__printAll=false; renderTable(FILTERED); window.removeEventListener('afterprint',restore); };
+  window.addEventListener('afterprint',restore); setTimeout(()=>window.print(),120);
+}
+
+/* ============================================================
+   5. ACTUALIZACIÓN EN VIVO DESDE datos.gov.co
+   Misma consulta, más modificaciones (cb9c-h8sn) y precios base
+   (p6dx-8zbt). Si la respuesta es menor al 95% de lo local, se
+   queda con datos.js: un dataset truncado se leería como «no hay».
+   ============================================================ */
+const API='https://www.datos.gov.co/resource/';
+const CAMPOS=['nit_entidad','proceso_de_compra','id_contrato','referencia_del_contrato','estado_contrato','tipo_de_contrato','modalidad_de_contratacion','justificacion_modalidad_de','fecha_de_firma','fecha_de_inicio_del_contrato','fecha_de_fin_del_contrato','proveedor_adjudicado','liquidaci_n','destino_gasto','valor_del_contrato','dias_adicionados','urlproceso','nombre_representante_legal','ultima_actualizacion','objeto_del_contrato','duraci_n_del_contrato','nombre_ordenador_del_gasto','nombre_supervisor','documento_proveedor','tipodocproveedor','descripcion_del_proceso','codigo_de_categoria_principal','es_pyme'].concat(NU.FUENTES.map(f=>f[1]));
+async function getJSON(url, ms=45000){
+  const ctrl=new AbortController(), t=setTimeout(()=>ctrl.abort(),ms);
+  try{ const r=await fetch(url,{signal:ctrl.signal}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }
+  finally{ clearTimeout(t); }
+}
+const lotes=(L,n)=>{ const o=[]; for(let i=0;i<L.length;i+=n) o.push(L.slice(i,i+n)); return o; };
+const lit=s=>"'"+String(s).replace(/'/g,"''")+"'";
+async function actualizarDesdeAPI(){
+  const st=$('m-status'); st.textContent='⟳ actualizando desde datos.gov.co…'; st.className='muted';
+  try{
+    const hasta=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,19);
+    const q=`SELECT ${CAMPOS.map(c=>'`'+c+'`').join(', ')} WHERE caseless_one_of(\`nombre_entidad\`, "${ENT}") AND \`fecha_de_firma\` BETWEEN "${DESDE}T00:00:00" :: floating_timestamp AND "${hasta}" :: floating_timestamp ORDER BY \`fecha_de_firma\` DESC, \`id_contrato\` LIMIT 50000`;
+    const contratos=await getJSON(API+'jbjy-vk9h.json?$query='+encodeURIComponent(q));
+    if(!Array.isArray(contratos) || contratos.length < D.contratos.length*0.95) throw new Error(`respuesta incompleta (${Array.isArray(contratos)?contratos.length:0} filas frente a ${D.contratos.length} locales)`);
+    const ids=[...new Set(contratos.map(c=>c.id_contrato))], bd=[...new Set(contratos.map(c=>c.proceso_de_compra).filter(Boolean))];
+    const [M,P]=await Promise.all([
+      Promise.all(lotes(ids,100).map(L=>getJSON(API+'cb9c-h8sn.json?'+new URLSearchParams({'$select':'identificador,id_contrato,tipo,descripcion,fecharegistro','$where':`id_contrato in (${L.map(lit).join(',')})`,'$order':'fecharegistro','$limit':'50000'})))).then(x=>x.flat()),
+      Promise.all(lotes(bd,100).map(L=>getJSON(API+'p6dx-8zbt.json?'+new URLSearchParams({'$select':'id_del_portafolio,precio_base','$where':`id_del_portafolio in (${L.map(lit).join(',')})`,'$limit':'50000'})))).then(x=>x.flat()),
+    ]);
+    const mods={}; M.sort((a,b)=>(a.fecharegistro||'').localeCompare(b.fecharegistro||'')).forEach(m=>{ (mods[m.id_contrato]=mods[m.id_contrato]||[]).push([m.tipo||'No definido',(m.fecharegistro||'').slice(0,10),(m.descripcion||'').slice(0,400)]); });
+    const base={}; P.forEach(p=>{ const v=parseFloat(p.precio_base)||0; base[p.id_del_portafolio]=Math.max(v, base[p.id_del_portafolio]||0); });
+    setData(contratos, base, mods);
+    refreshControls(); renderLead(); renderDepuracion(); render();
+    st.textContent='● datos en línea · '+new Date().toLocaleString('es-CO',{dateStyle:'medium',timeStyle:'short'}); st.className='online';
+    console.log('[dashboard] actualizado desde la API:',RAW.length,'contratos ·',M.length,'modificaciones ·',P.length,'procesos');
+  }catch(e){
+    st.textContent='● sin conexión · datos locales del '+(META.descargado||'?'); st.className='offline';
+    console.log('[dashboard] API no disponible ('+e.message+'): se usan los datos locales');
+  }
+}
+
+/* ============================================================
+   6. INICIO
+   ============================================================ */
+setData(D.contratos, D.base, D.mods);
+fillSort(); initControls(); renderColsPanel(); refreshControls(); renderLead(); renderDepuracion(); render();
+console.log('[dashboard] OK · contratos:',RAW.length,'· valor total:',fmtCOP(sumV(RAW)));
+actualizarDesdeAPI();
+</script>
+</body>
+</html>
